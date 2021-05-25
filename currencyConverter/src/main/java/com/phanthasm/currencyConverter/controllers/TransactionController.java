@@ -21,7 +21,7 @@ public class TransactionController {
         return ResponseEntity.ok( serviceTransaction.findAll() );
     }
 
-    @PostMapping()
+    @PostMapping(value="/convert")
     ResponseEntity<TransactionSuccessDTO> convert(@RequestBody Transaction transaction) {
         return ResponseEntity.ok( serviceTransaction.save(transaction) );
     }
