@@ -1,12 +1,12 @@
 package com.phanthasm.currencyConverter.controllers;
 
 import com.phanthasm.currencyConverter.dto.TransactionDTO;
+import com.phanthasm.currencyConverter.dto.TransactionSuccessDTO;
+import com.phanthasm.currencyConverter.entities.Transaction;
 import com.phanthasm.currencyConverter.services.TransactionService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
@@ -19,5 +19,10 @@ public class TransactionController {
     @GetMapping
     public ResponseEntity<List<TransactionDTO>> findAll() {
         return ResponseEntity.ok( serviceTransaction.findAll() );
+    }
+
+    @PostMapping()
+    ResponseEntity<TransactionSuccessDTO> convert(@RequestBody Transaction transaction) {
+        return ResponseEntity.ok( serviceTransaction.save(transaction) );
     }
 }

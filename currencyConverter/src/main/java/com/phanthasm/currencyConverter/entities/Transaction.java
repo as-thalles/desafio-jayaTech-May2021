@@ -22,7 +22,6 @@ public class Transaction {
     public Transaction() {}
 
     public Transaction(Long id, String currencyOrigin, String currencyTarget, Double value, Double exchangeRate, LocalDateTime date, User user) {
-        super();
         this.id = id;
         this.currencyOrigin = currencyOrigin;
         this.currencyTarget = currencyTarget;
@@ -72,7 +71,7 @@ public class Transaction {
         this.exchangeRate = exchangeRate;
     }
 
-    public LocalDateTime getDate() {
+    public LocalDateTime getDateTime() {
         return date;
     }
 

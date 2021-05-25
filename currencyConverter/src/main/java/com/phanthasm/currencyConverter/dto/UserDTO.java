@@ -1,10 +1,8 @@
 package com.phanthasm.currencyConverter.dto;
 
-import com.phanthasm.currencyConverter.entities.Transaction;
 import com.phanthasm.currencyConverter.entities.User;
 
 import java.io.Serializable;
-import java.util.List;
 
 public class UserDTO implements Serializable {
     public static final long serialVersionUID = 1L;
