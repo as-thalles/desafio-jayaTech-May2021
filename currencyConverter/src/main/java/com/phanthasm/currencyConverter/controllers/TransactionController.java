@@ -25,4 +25,9 @@ public class TransactionController {
     ResponseEntity<TransactionSuccessDTO> convert(@RequestBody Transaction transaction) {
         return ResponseEntity.ok( serviceTransaction.save(transaction) );
     }
+
+    @GetMapping(value="/byIdUser")
+    ResponseEntity<List<TransactionDTO>> findByIdUser(@RequestParam Long idUser) {
+        return ResponseEntity.ok( serviceTransaction.findByUser(idUser) );
+    }
 }

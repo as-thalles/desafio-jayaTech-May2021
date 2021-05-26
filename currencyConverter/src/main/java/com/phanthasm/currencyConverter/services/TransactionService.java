@@ -47,4 +47,8 @@ public class TransactionService {
 
         return tsDTO;
     }
+
+    public List<TransactionDTO> findByUser(Long idUser) {
+        return repositoryTransaction.findByUser(idUser).stream().map(x -> new TransactionDTO(x)).collect(Collectors.toList());
+    }
 }
