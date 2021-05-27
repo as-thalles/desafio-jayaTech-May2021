@@ -15,6 +15,10 @@ public class UserService {
     @Autowired
     private UserRepository repositoryUser;
 
+    public UserService(UserRepository repository) {
+        this.repositoryUser = repository;
+    }
+
     public List<UserDTO> findAll() {
         return repositoryUser.findAll().stream().map(x -> new UserDTO(x)).collect(Collectors.toList());
     }
