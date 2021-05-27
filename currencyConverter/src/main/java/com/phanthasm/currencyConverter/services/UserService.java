@@ -23,6 +23,10 @@ public class UserService {
         return repositoryUser.findAll().stream().map(x -> new UserDTO(x)).collect(Collectors.toList());
     }
 
+    public UserDTO save(User user) {
+        return new UserDTO(repositoryUser.save(user));
+    }
+
     public Optional<UserDTO> findById(Long id) {
         Optional<User> user = repositoryUser.findById(id);
         return user.isPresent() ? Optional.of(new UserDTO(user.get())) : Optional.empty();

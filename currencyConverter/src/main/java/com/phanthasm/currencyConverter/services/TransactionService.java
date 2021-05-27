@@ -27,11 +27,16 @@ public class TransactionService {
     @Autowired
     private UserService serviceUser;
 
+    public TransactionService(TransactionRepository repository) {
+        this.repositoryTransaction = repository;
+    }
+
     public List<TransactionDTO> findAll() {
         return repositoryTransaction.findAll().stream().map(x -> new TransactionDTO(x)).collect(Collectors.toList());
     }
 
     public TransactionSuccessDTO save(Transaction transaction) {
+        transaction.setDate(LocalDateTime.now(ZoneOffset.UTC));
         return new TransactionSuccessDTO(repositoryTransaction.save(transaction));
     }
 
@@ -60,7 +65,6 @@ public class TransactionService {
         Double targetValue = exchangeRate * transaction.getValue();
 
         transaction.setExchangeRate(exchangeRate);
-        transaction.setDate(transaction.getDateTime() == null ? LocalDateTime.now(ZoneOffset.UTC) : transaction.getDateTime());
 
         TransactionSuccessDTO tsDTO = this.save(transaction);
         tsDTO.setValueTarget(targetValue);
