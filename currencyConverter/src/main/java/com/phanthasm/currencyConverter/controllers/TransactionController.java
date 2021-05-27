@@ -5,10 +5,12 @@ import com.phanthasm.currencyConverter.dto.TransactionSuccessDTO;
 import com.phanthasm.currencyConverter.entities.Transaction;
 import com.phanthasm.currencyConverter.services.TransactionService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Optional;
 
 @RestController
 @RequestMapping(value = "/transactions")
@@ -23,7 +25,11 @@ public class TransactionController {
 
     @PostMapping(value="/convert")
     ResponseEntity<TransactionSuccessDTO> convert(@RequestBody Transaction transaction) {
-        return ResponseEntity.ok( serviceTransaction.save(transaction) );
+        Optional<TransactionSuccessDTO> result = serviceTransaction.convert(transaction);
+        if(result.isPresent()) {
+            return ResponseEntity.ok( result.get() );
+        }
+        return new ResponseEntity("Specified parameters are invalid.", HttpStatus.BAD_REQUEST);
     }
 
     @GetMapping(value="/byIdUser")

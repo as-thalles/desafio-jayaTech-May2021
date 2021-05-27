@@ -16,4 +16,8 @@ public class CurrencyService {
     public List<CurrencyDTO> findAll() {
         return repositoryCurrency.findAll().stream().map(x -> new CurrencyDTO(x)).collect(Collectors.toList());
     }
+
+    public List<CurrencyDTO> findAllById(List<String> ids) {
+        return repositoryCurrency.findAllById(ids).stream().map(x -> new CurrencyDTO(x)).collect(Collectors.toList());
+    }
 }

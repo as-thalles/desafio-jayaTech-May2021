@@ -1,20 +1,20 @@
 package com.phanthasm.currencyConverter.services;
 
+import com.phanthasm.currencyConverter.dto.CurrencyDTO;
 import com.phanthasm.currencyConverter.dto.TransactionDTO;
 import com.phanthasm.currencyConverter.dto.TransactionSuccessDTO;
-import com.phanthasm.currencyConverter.entities.Currency;
+import com.phanthasm.currencyConverter.dto.UserDTO;
 import com.phanthasm.currencyConverter.entities.Transaction;
-import com.phanthasm.currencyConverter.repositories.CurrencyRepository;
 import com.phanthasm.currencyConverter.repositories.TransactionRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import org.springframework.web.client.HttpClientErrorException;
 
 import java.time.LocalDateTime;
 import java.time.ZoneOffset;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
@@ -23,29 +23,49 @@ public class TransactionService {
     @Autowired
     private TransactionRepository repositoryTransaction;
     @Autowired
-    private CurrencyRepository repositoryCurrency;
+    private CurrencyService serviceCurrency;
+    @Autowired
+    private UserService serviceUser;
 
     public List<TransactionDTO> findAll() {
         return repositoryTransaction.findAll().stream().map(x -> new TransactionDTO(x)).collect(Collectors.toList());
     }
 
     public TransactionSuccessDTO save(Transaction transaction) {
-        Map<String, Currency> map = repositoryCurrency.findAllById(
-                                        Arrays.asList(transaction.getCurrencyOrigin(), transaction.getCurrencyTarget())
-                                    ).stream().collect(Collectors.toMap(Currency::getName, Function.identity()));
+        return new TransactionSuccessDTO(repositoryTransaction.save(transaction));
+    }
 
-        var currencyO = map.get(transaction.getCurrencyOrigin());
-        var currencyT = map.get(transaction.getCurrencyTarget());
-        Double exchangeRate = currencyT.getValue() / currencyO.getValue();
+    public Optional<TransactionSuccessDTO> convert(Transaction transaction) {
+        // Validate transaction
+        if(!transaction.isValid()) {
+            return Optional.empty();
+        }
+
+        List<String> currenciesList = Arrays.asList(transaction.getCurrencyOrigin().toUpperCase(), transaction.getCurrencyTarget().toUpperCase());
+        Map<String, CurrencyDTO> map = serviceCurrency.findAllById(currenciesList).stream().collect(Collectors.toMap(CurrencyDTO::getName, Function.identity()));
+        Optional<CurrencyDTO> currencyO = Optional.ofNullable(map.get(transaction.getCurrencyOrigin().toUpperCase()));
+        Optional<CurrencyDTO> currencyT = Optional.ofNullable(map.get(transaction.getCurrencyTarget().toUpperCase()));
+
+        if(currencyO.isEmpty() || currencyT.isEmpty()) {
+            return Optional.empty();
+        }
+
+        Optional<UserDTO> user = serviceUser.findById(transaction.getUser().getId());
+        if(user.isEmpty()) {
+            return Optional.empty();
+        }
+
+        // Transaction
+        Double exchangeRate = Transaction.calculateExchangeRate(currencyO.get().getValue(), currencyT.get().getValue());
         Double targetValue = exchangeRate * transaction.getValue();
 
         transaction.setExchangeRate(exchangeRate);
         transaction.setDate(transaction.getDateTime() == null ? LocalDateTime.now(ZoneOffset.UTC) : transaction.getDateTime());
 
-        TransactionSuccessDTO tsDTO = new TransactionSuccessDTO(repositoryTransaction.save(transaction));
+        TransactionSuccessDTO tsDTO = this.save(transaction);
         tsDTO.setValueTarget(targetValue);
 
-        return tsDTO;
+        return Optional.of(tsDTO);
     }
 
     public List<TransactionDTO> findByUser(Long idUser) {

@@ -86,4 +86,17 @@ public class Transaction {
     public void setUser(User user) {
         this.user = user;
     }
+
+    public static Double calculateExchangeRate(Double a, Double b) {
+        return b / a;
+    }
+
+    public Boolean isValid() {
+        return this.getValue() >= 0 &&
+              !this.getCurrencyOrigin().isEmpty() &&
+              !this.getCurrencyTarget().isEmpty() &&
+               this.getUser() != null &&
+               this.getUser().getId() != null &&
+               this.getUser().getId() > 0;
+    }
 }
